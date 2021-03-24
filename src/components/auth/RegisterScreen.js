@@ -1,9 +1,18 @@
 import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
+import validator from 'validator';
+import { removeError, setError } from '../../actions/ui';
+
 import { useForm } from '../../Hooks/useForm';
 
 export const RegisterScreen = () => {
-z
+
+    const dispatch = useDispatch()
+    const state = useSelector(state => state)
+    const { msgError } = state.ui
+    console.log(msgError)
+
     const [{name, email, password, password2}, handleInputChange ] = useForm({
         name: 'Hernando',
         email: 'otromail@gmail.com',
@@ -13,14 +22,40 @@ z
 
     const handleRegister = (e) => {
         e.preventDefault()
-        console.log(name, email, password, password2)
+        if ( isFormValid() ) {
+            console.log('formulario correcto')
+        }
     }
+
+    const isFormValid = () => {
+        if (validator.isEmpty(name)) {
+            dispatch(setError('Name is required'))
+            return false
+        } else if (!validator.isEmail( email )) {
+             dispatch(setError('is not valid email'))
+             return false   
+        } else if (!validator.equals(password, password2)|| password.lenght < 5 ) {
+           dispatch (setError('password should be at least 6 characters and match '))
+            return false
+        }
+        dispatch(removeError())
+        return true;
+    }
+   
 
     return (
         <>
             <h3 className="auth__title">Register</h3>
 
             <form onSubmit={handleRegister}>
+                {   
+                    msgError &&
+                    <div className="auth__alert-error">
+                        { msgError }
+                    </div>
+
+                }
+
 
                 <input 
                     type="text"
@@ -31,7 +66,6 @@ z
                     value={name}
                     onChange={handleInputChange}
                 />
-
                 <input 
                     type="text"
                     placeholder="Email"
@@ -42,7 +76,6 @@ z
                     onChange={handleInputChange}
                     
                 />
-
                 <input 
                     type="password"
                     placeholder="Password"
@@ -51,7 +84,6 @@ z
                     value={password}
                     onChange={handleInputChange}
                 />
-
                 <input 
                     type="password"
                     placeholder="Confirm password"
@@ -60,24 +92,18 @@ z
                     value={password2}
                     onChange={handleInputChange}
                 />
-
-
                 <button
                     type="submit"
                     className="btn btn-primary btn-block mb-5"
                 >
                     Register
                 </button>
-
-               
-
                 <Link 
                     to="/auth/login"
                     className="link"
                 >
                     Already registered?
                 </Link>
-
             </form>
         </>
     )
