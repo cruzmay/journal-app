@@ -31,6 +31,7 @@ export const Sidebar = () => {
                 <p className="mt-5">
                     New entry
                 </p>
+                <JournalEntries/>
             </div>
         </aside>
     )
